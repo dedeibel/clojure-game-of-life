@@ -25,3 +25,4 @@
   (is (= false (next_cell_state (newLivingCell) 4)))
   (is (= true  (next_cell_state (newDeadCell) 3)))
 )
+
