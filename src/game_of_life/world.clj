@@ -11,6 +11,10 @@
   (str x "x" y)
 )
 
+(defn- neighbour_keywords []
+  [:nw :n :ne :w :e :sw :s :se]
+)
+
 (declare newWorld)
 
 (defrecord SimpleWorld [
@@ -26,12 +30,15 @@
     (grid (makeKey x y))
   )
   (neighboursOf [this x y]
-    (for 
-      [
-        xOffset [-1 0 1] yOffset [-1 0 1]
-        :when (not (= 0 xOffset yOffset))
-      ]
-      (retrieve this (+ x xOffset) (+ y yOffset))
+    (zipmap
+      (neighbour_keywords)
+      (for 
+        [
+          xOffset [-1 0 1] yOffset [-1 0 1]
+          :when (not (= 0 xOffset yOffset))
+        ]
+        (retrieve this (+ x xOffset) (+ y yOffset))
+      )
     )
   )
 )

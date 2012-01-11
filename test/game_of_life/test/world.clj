@@ -26,19 +26,20 @@
   )
 )
 
-; TODO make it a test
-(deftest test_neighbours
+(deftest test_neighbours_not_self
   (let [world (-> (newWorld)
       (put 1 1 (newLivingCell))
       (put 0 0 (newLivingCell))
     )]
-    (is (=
-      [(newLivingCell) nil nil
-       nil     nil
-       nil nil nil]
-       (neighboursOf world 1 1)
-     )
-    )
+    (is (not (= 8 (count (neighboursOf world 1 1)))))
+    (is (= 8 (count (neighboursOf world 1 1))))
+    (is (= (newLivingCell) (:nw (neighboursOf world 1 1))))
   )
 )
 
+(deftest test_neighbours_none
+  (let [world (newWorld)]
+    (is (= 8 (count (neighboursOf world 1 1))))
+    (is (not (some #(= %1 newLivingCell) (neighboursOf world 1 1))))
+  )
+)
