@@ -31,15 +31,36 @@
       (put 1 1 (newLivingCell))
       (put 0 0 (newLivingCell))
     )]
-    (is (not (= 8 (count (neighboursOf world 1 1)))))
-    (is (= 8 (count (neighboursOf world 1 1))))
+    (is (= 1
+      (count
+        (filter
+          #(= (newLivingCell) %1)
+          (vals (neighboursOf world 1 1))
+        )
+      )
+    ))
     (is (= (newLivingCell) (:nw (neighboursOf world 1 1))))
+  )
+)
+
+(deftest test_neighbours_keys
+  (is (=
+        (sort [:nw :n :ne :w :e :sw :s :se])
+        (sort (keys (neighboursOf (newWorld) 1 1)))
+      )
+  )
+)
+
+(deftest test_neighbours_vals
+  (is
+    (= 8 (count (vals (neighboursOf (newWorld) 1 1))))
   )
 )
 
 (deftest test_neighbours_none
   (let [world (newWorld)]
-    (is (= 8 (count (neighboursOf world 1 1))))
-    (is (not (some #(= %1 newLivingCell) (neighboursOf world 1 1))))
+    (is (not (contains? (vals (neighboursOf world 1 1)) (newLivingCell))))
+    (is (not (contains? (vals (neighboursOf world 1 1)) (newDeadCell))))
   )
 )
+
