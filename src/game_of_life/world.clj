@@ -1,35 +1,43 @@
 (ns game_of_life.world)
 
 (defprotocol World
-  (neighboursOf [this x y])
-  (allCells [this])
-  (put [this x y cell])
+  (neighbours_of [this x y])
+  (living_cells [this])
+  (invigorate [this x y])
+  (alive [this x y])
+  (kill [this x y])
   (retrieve [this x y])
 )
 
-(defn- makeKey [x y]
-  (str x "x" y)
+(defn- make_key [x y]
+  [x y]
 )
 
 (defn- neighbour_keywords []
   [:nw :n :ne :w :e :sw :s :se]
 )
 
-(declare newWorld)
+(declare new_world)
 
 (defrecord SimpleWorld [
     grid
   ]
 
   World
-  (allCells [this] grid)
-  (put [this x y cell]
-    (newWorld (assoc grid (makeKey x y) cell))
+  (living_cells [this] (seq grid))
+  (invigorate [this x y]
+    (new_world (conj grid (make_key x y)))
+  )
+  (alive [this x y]
+    (get grid (make_key x y) false)
+  )
+  (kill [this x y]
+    (new_world (disj grid (make_key x y)))
   )
   (retrieve [this x y]
-    (grid (makeKey x y))
+    (get grid (make_key x y))
   )
-  (neighboursOf [this x y]
+  (neighbours_of [this x y]
     (zipmap
       (neighbour_keywords)
       (for 
@@ -43,8 +51,8 @@
   )
 )
 
-(defn newWorld
-  ([] (SimpleWorld. {}))
+(defn new_world
+  ([] (SimpleWorld. #{}))
   ([world] (SimpleWorld. world))
 )
 

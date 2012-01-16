@@ -5,62 +5,61 @@
 )
 
 (deftest test_add
-  (let [subject (newDeadCell)]
-    (is (= subject (-> (newWorld) (put 0 0 subject) (retrieve 0 0))))
-    (is (= nil     (-> (newWorld) (put 0 0 subject) (retrieve 0 1))))
-    (is (= subject (-> (newWorld) (put 1 0 subject) (retrieve 1 0))))
-    (is (= subject (-> (newWorld) (put 0 1 subject) (retrieve 0 1))))
-  )
+  (is (-> (new_world) (invigorate 0 0) (alive 0 0)))
+  (is (not (-> (new_world) (invigorate 0 0) (alive 0 1))))
+  (is (-> (new_world) (invigorate 1 0) (alive 1 0)))
 )
 
 (deftest test_add_multi
   (is
-    (= (newDeadCell)
-       (-> (newWorld)
-           (put 1 1 (newLivingCell))
-           (put 2 3 (newDeadCell))
-           (put 10 22 (newDeadCell))
-           (retrieve 2 3)
-       )
+    (-> (new_world)
+        (invigorate 1 1)
+        (invigorate 2 3)
+        (invigorate 10 22)
+        (alive 2 3)
     )
   )
 )
 
+(deftest test_alive_kill
+  (is (not (-> (new_world) (invigorate 0 1) (kill 0 1) (alive 0 1))))
+)
+
 (deftest test_neighbours_not_self
-  (let [world (-> (newWorld)
-      (put 1 1 (newLivingCell))
-      (put 0 0 (newLivingCell))
+  (let [world (-> (new_world)
+      (invigorate 1 1)
+      (invigorate 0 0)
     )]
     (is (= 1
       (count
         (filter
-          #(= (newLivingCell) %1)
-          (vals (neighboursOf world 1 1))
+          #(when %1 true)
+          (vals (neighbours_of world 1 1))
         )
       )
     ))
-    (is (= (newLivingCell) (:nw (neighboursOf world 1 1))))
+    (is (:nw (neighbours_of world 1 1)))
   )
 )
 
 (deftest test_neighbours_keys
   (is (=
         (sort [:nw :n :ne :w :e :sw :s :se])
-        (sort (keys (neighboursOf (newWorld) 1 1)))
+        (sort (keys (neighbours_of (new_world) 1 1)))
       )
   )
 )
 
 (deftest test_neighbours_vals
   (is
-    (= 8 (count (vals (neighboursOf (newWorld) 1 1))))
+    (= 8 (count (vals (neighbours_of (new_world) 1 1))))
   )
 )
 
 (deftest test_neighbours_none
-  (let [world (newWorld)]
-    (is (not (contains? (vals (neighboursOf world 1 1)) (newLivingCell))))
-    (is (not (contains? (vals (neighboursOf world 1 1)) (newDeadCell))))
+  (let [world (new_world)]
+    (is (not (some #(true? %1) (vals (neighbours_of world 1 1)))))
+    (is (not (some #(true? %1) (vals (neighbours_of world 1 1)))))
   )
 )
 
