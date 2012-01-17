@@ -1,5 +1,9 @@
 (ns game_of_life.cell)
 
+(defn new_cell [x y]
+  {:x x :y y}
+)
+
 (defn survives [neighbours]
   (cond
     (= 2 neighbours) true
@@ -7,7 +11,6 @@
     true false
   )
 )
-
 
 (defn comes_to_life [neighbours]
     (= neighbours 3)
