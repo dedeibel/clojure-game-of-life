@@ -1,4 +1,6 @@
-(ns game_of_life.world)
+(ns game_of_life.world
+  (:use game_of_life.cell)
+)
 
 (defprotocol World
   (neighbours_of [this cell] [this x y])
@@ -21,51 +23,41 @@
 
   World
   (living_cells [this] (seq grid))
-  (invigorate
-    ([this cell]
-      (new_world (conj grid cell))
-    )
-    ([this x y]
-      (recur this (new_cell x y))
-    )
+  (invigorate [this cell]
+    (new_world (conj grid cell))
   )
-  (alive 
-    ([this x y]
-      (recur this (new_cell x y))
-    )
-    ([this cell]
-      (get grid cell false)
-    )
+  (invigorate [this x y]
+    (invigorate this (new_cell x y))
   )
-  (kill
-    ([this x y]
-      (recur this (new_cell x y))
-    )
-    ([this cell]
-      (new_world (disj grid cell))
-    )
+  (alive [this cell]
+    (get grid cell false)
   )
-  (retrieve
-    ([this x y]
-      (get grid (new_cell x y))
-    )
+  (alive [this x y]
+    (alive this (new_cell x y))
   )
-  (neighbours_of
-    ([this x y]
-      (recur this (new_cell x y))
-    )
-    ([this cell]
-      (zipmap
-        (neighbour_keywords)
-        (for 
-          [
-            xOffset [-1 0 1] yOffset [-1 0 1]
-            :when (not (= 0 xOffset yOffset))
-          ]
-          (retrieve this (+ (:x cell) xOffset) (+ (:y cell) yOffset))
-        )
+  (kill [this cell]
+    (new_world (disj grid cell))
+  )
+  (kill [this x y]
+    (kill this (new_cell x y))
+  )
+  (retrieve [this x y]
+    (get grid (new_cell x y))
+  )
+  (neighbours_of [this cell]
+    (zipmap
+      (neighbour_keywords)
+      (for 
+        [
+          xOffset [-1 0 1] yOffset [-1 0 1]
+          :when (not (= 0 xOffset yOffset))
+        ]
+        (retrieve this (+ (:x cell) xOffset) (+ (:y cell) yOffset))
       )
     )
+  )
+  (neighbours_of [this x y]
+    (neighbours_of this (new_cell x y))
   )
 )
 

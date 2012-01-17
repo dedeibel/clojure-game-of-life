@@ -8,4 +8,5 @@
 )
 
 (defn next_generation_of_cell [world unchecked_cells]
-  (
+  nil
+)
