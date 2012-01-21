@@ -6,7 +6,7 @@
   (neighbours_of [this cell] [this x y])
   (living_cells [this])
   (invigorate [this cell])
-  (alive [this cell] [this x y])
+  (alive [this x y])
   (kill [this cell] [this x y])
   (retrieve [this x y])
 )
@@ -31,11 +31,11 @@
   (invigorate [this cell]
     (new_world (assoc grid (make_key cell) cell))
   )
-  (alive [this cell]
-    (get grid cell false)
-  )
   (alive [this x y]
-    (alive this (WorldKey. x y))
+    (if-let [cell (get grid (WorldKey. x y))]
+      (:alive cell)
+      false
+    )
   )
   (kill [this cell]
     (new_world (dissoc grid (make_key cell)))

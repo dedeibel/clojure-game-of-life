@@ -26,3 +26,7 @@
   )
 )
 
+(defn revive [cell]
+  (Cell. (:x cell) (:y cell) :alive)
+)
+
