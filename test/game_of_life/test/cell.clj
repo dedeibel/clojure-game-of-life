@@ -19,10 +19,11 @@
 ) 
 
 (deftest test_next_cell_state
-  (is (= false (next_cell_state false 0)))
-  (is (= true  (next_cell_state :alive 2)))
-  (is (= false (next_cell_state :alive 1)))
-  (is (= false (next_cell_state :alive 4)))
-  (is (= true  (next_cell_state :alive 3)))
+  (is (= false (next_cell_state (new_cell 0 0 false) 0)))
+  (is (= false (next_cell_state (new_cell 0 0 false) 2)))
+  (is (= true  (next_cell_state (new_cell 0 0) 2)))
+  (is (= false (next_cell_state (new_cell 0 0) 1)))
+  (is (= false (next_cell_state (new_cell 0 0) 4)))
+  (is (= true  (next_cell_state (new_cell 0 0) 3)))
 )
 

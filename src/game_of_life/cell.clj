@@ -1,25 +1,28 @@
 (ns game_of_life.cell)
 
-(defn new_cell [x y]
-  {:x x :y y}
+(defrecord Cell [x y alive])
+
+(defn new_cell 
+  ([x y] (Cell. x y true))
+  ([x y alive] (Cell. x y alive))
 )
 
-(defn survives [neighbours]
+(defn survives [number_of_neighbours]
   (cond
-    (= 2 neighbours) true
-    (= 3 neighbours) true
+    (= 2 number_of_neighbours) true
+    (= 3 number_of_neighbours) true
     true false
   )
 )
 
-(defn comes_to_life [neighbours]
-    (= neighbours 3)
+(defn comes_to_life [number_of_neighbours]
+    (= number_of_neighbours 3)
 )
 
-(defn next_cell_state [is_currently_alive neighbours]
-  (if is_currently_alive
-		(survives neighbours)
-		(comes_to_life neighbours)
+(defn next_cell_state [cell number_of_neighbours]
+  (if (:alive cell)
+		(survives number_of_neighbours)
+		(comes_to_life number_of_neighbours)
   )
 )
 

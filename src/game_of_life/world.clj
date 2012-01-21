@@ -5,10 +5,15 @@
 (defprotocol World
   (neighbours_of [this cell] [this x y])
   (living_cells [this])
-  (invigorate [this cell] [this x y])
+  (invigorate [this cell])
   (alive [this cell] [this x y])
   (kill [this cell] [this x y])
   (retrieve [this x y])
+)
+
+(defrecord WorldKey [x y])
+(defn- make_key [cell]
+  (WorldKey. (:x cell) (:y cell))
 )
 
 (defn- neighbour_keywords []
@@ -24,31 +29,27 @@
   World
   (living_cells [this] (seq grid))
   (invigorate [this cell]
-    (new_world (conj grid cell))
-  )
-  (invigorate [this x y]
-    (invigorate this (new_cell x y))
+    (new_world (assoc grid (make_key cell) cell))
   )
   (alive [this cell]
     (get grid cell false)
   )
   (alive [this x y]
-    (alive this (new_cell x y))
+    (alive this (WorldKey. x y))
   )
   (kill [this cell]
-    (new_world (disj grid cell))
+    (new_world (dissoc grid (make_key cell)))
   )
   (kill [this x y]
-    (kill this (new_cell x y))
+    (kill this (WorldKey. x y))
   )
   (retrieve [this x y]
-    (get grid (new_cell x y))
+    (get grid (WorldKey. x y))
   )
   (neighbours_of [this cell]
     (zipmap
       (neighbour_keywords)
-      (for 
-        [
+      (for [
           xOffset [-1 0 1] yOffset [-1 0 1]
           :when (not (= 0 xOffset yOffset))
         ]
@@ -57,12 +58,29 @@
     )
   )
   (neighbours_of [this x y]
-    (neighbours_of this (new_cell x y))
+    (neighbours_of this (WorldKey. x y))
   )
 )
 
+(defn number_of [neighbours]
+  (count (vals neighbours))
+)
+
+(defmacro filter-map [bindings pred m]
+  `(select-keys ~m
+    (for [~bindings ~m
+      :when ~pred]
+      ~(first bindings)
+    )
+  )
+)
+
+(defn living [neighbours]
+  (filter-map [key val] (:alive val) neighbours)
+)
+
 (defn new_world
-  ([] (SimpleWorld. #{}))
+  ([] (SimpleWorld. {}))
   ([world] (SimpleWorld. world))
 )
 
