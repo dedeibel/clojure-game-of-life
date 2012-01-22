@@ -26,6 +26,22 @@
   )
 )
 
+(defn next_cell_state [cell number_of_neighbours]
+  (if (:alive cell)
+		(survives number_of_neighbours)
+		(comes_to_life number_of_neighbours)
+  )
+)
+
+(defn next_cell_action [cell number_of_neighbours]
+  (cond
+    (and      (:alive cell)  (not (survives number_of_neighbours))) :kill
+    (and (not (:alive cell)) (comes_to_life number_of_neighbours))  :revive
+    (:alive cell)       :keep-alive
+    (not (:alive cell)) :stay-dead
+  )
+)
+
 (defn revive [cell]
   (Cell. (:x cell) (:y cell) :alive)
 )

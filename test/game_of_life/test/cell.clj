@@ -18,12 +18,12 @@
   (is (= true  (comes_to_life 3)))
 ) 
 
-(deftest test_next_cell_state
-  (is (= false (next_cell_state (new_cell 0 0 false) 0)))
-  (is (= false (next_cell_state (new_cell 0 0 false) 2)))
-  (is (= true  (next_cell_state (new_cell 0 0) 2)))
-  (is (= false (next_cell_state (new_cell 0 0) 1)))
-  (is (= false (next_cell_state (new_cell 0 0) 4)))
-  (is (= true  (next_cell_state (new_cell 0 0) 3)))
+(deftest test_next_cell_action
+  (is (= :stay-dead  (next_cell_action (new_cell 0 0 false) 0)))
+  (is (= :revive     (next_cell_action (new_cell 0 0 false) 3)))
+  (is (= :keep-alive (next_cell_action (new_cell 0 0) 2)))
+  (is (= :keep-alive (next_cell_action (new_cell 0 0) 3)))
+  (is (= :kill       (next_cell_action (new_cell 0 0) 1)))
+  (is (= :kill       (next_cell_action (new_cell 0 0) 4)))
 )
 

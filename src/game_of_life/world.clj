@@ -4,6 +4,7 @@
 
 (defprotocol World
   (neighbours_of [this cell] [this x y])
+  (all_neighbours_of [this cell create_cell] [this x y create_cell])
   (living_cells [this])
   (invigorate [this cell])
   (alive [this x y])
@@ -46,6 +47,27 @@
   (retrieve [this x y]
     (get grid (WorldKey. x y))
   )
+  (all_neighbours_of [this cell create_cell]
+  ; bpeter todo macro the zipmap thing?
+    (zipmap
+      (neighbour_keywords)
+      (for [
+          xOffset [-1 0 1] yOffset [-1 0 1]
+          :when (not (= 0 xOffset yOffset))
+        ]
+        (let [cur_x (+ (:x cell) xOffset)
+              cur_y (+ (:y cell) yOffset)]
+          (if-let [living_cell (retrieve this cur_x cur_y)]
+            living_cell
+            (create_cell cur_x cur_y false)
+          )
+        )
+      )
+    )
+  )
+  (all_neighbours_of [this x y create_cell]
+    (all_neighbours_of this (WorldKey. x y) create_cell)
+  )
   (neighbours_of [this cell]
     (zipmap
       (neighbour_keywords)
@@ -53,7 +75,10 @@
           xOffset [-1 0 1] yOffset [-1 0 1]
           :when (not (= 0 xOffset yOffset))
         ]
-        (retrieve this (+ (:x cell) xOffset) (+ (:y cell) yOffset))
+        (let [cur_x (+ (:x cell) xOffset)
+              cur_y (+ (:y cell) yOffset)]
+          (retrieve this cur_x cur_y)
+        )
       )
     )
   )
@@ -77,6 +102,10 @@
 
 (defn living [neighbours]
   (filter-map [key val] (:alive val) neighbours)
+)
+
+(defn dead [neighbours]
+  (filter-map [key val] (not (:alive val)) neighbours)
 )
 
 (defn new_world
