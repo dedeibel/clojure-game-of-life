@@ -16,38 +16,40 @@
 )
 
 (defprotocol PrintControler
-  (linebreak [this])
-  (dead      [this])
-  (living    [this])
+  (out [this])
 )
 
-(defrecord PrintControlerImpl [curx cury cells]
+(defrecord PrintControlerImpl [curx cury cells printer]
+  PrintControler
+  (out [this]
+    (prn curx cury cells printer)
+  )
   ; X und Y werden zunehmend erhoeht
   ; Wenn Y nicht uebereinstimmt, wird linebreak ausgegeben
   ; Wenn X nicht uebereinstimmt, wird leerstelle ausgegeben
   ; Wenn X und Y mit first cells ubereinstimmt wird 'X' ausgegeben
 )
 
-(defn new_printer [world new_cell]
+(defn- find_minx
+  ([cells] (find_minx nil cells))
+  ([minx cells]
+    (if (seq cells)
+      (if (< minx (:x (first cells)))
+        (recur (:x (first cells)) (rest cells))
+        (recur minx (rest cells))
+      )
+      minx
+    )
+  )
+)
+
+(defn new_printer []
   (CliWorldPrinter.)
 )
 
-(defn- print_cell [startx starty printer cells]
-  (if-let [desc (seq world_desc)]
-    (recur 
-      (case (first desc)
-        \X (living builder)
-        \x (living builder)
-        \. (dead builder)
-        \space (dead builder)
-        \newline (linebreak builder)
-        \, builder
-        (throw (IllegalArgumentException.
-          (str "Invalid input char" (first desc))))
-      )
-      (rest desc)
-    )
-    (:world builder)
+(defn new_print_controler [cells]
+  (let [miny (:y (first cells)) minx (find_minx cells)]
+    (PrintControlerImpl. minx miny cells (new_printer))
   )
 )
 
@@ -56,6 +58,6 @@
 )
 
 (defn to_string [world]
-  (print_cell (new_printer) (sort-lo-ru (living_cells world))
+  (out (new_print_controler (sort-lo-ru (living_cells world))))
 )
 
