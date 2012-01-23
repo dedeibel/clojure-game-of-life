@@ -28,7 +28,7 @@
   ]
 
   World
-  (living_cells [this] (seq grid))
+  (living_cells [this] (vals grid))
   (invigorate [this cell]
     (new_world (assoc grid (make_key cell) cell))
   )

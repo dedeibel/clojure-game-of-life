@@ -3,39 +3,54 @@
 )
 
 (defprotocol WorldPrinter
-  (linebreak [this])
-  (dead      [this])
-  (living    [this])
+  (linebreak    [this])
+  (dead_cell    [this])
+  (living_cell  [this])
 )
 
 (defrecord CliWorldPrinter []
   WorldPrinter
-  (linebreak [this] (println))
-  (dead      [this] (print \space))
-  (living    [this] (print \X))
+  (linebreak   [this] (println))
+  (dead_cell   [this] (print \space))
+  (living_cell [this] (print \X))
 )
 
 (defprotocol PrintControler
   (out [this])
+  (step [this curx cury cells])
 )
 
-(defrecord PrintControlerImpl [curx cury cells printer]
+(defrecord PrintControlerImpl [minx curx cury cells printer]
   PrintControler
   (out [this]
-    (prn curx cury cells printer)
+    (do
+      (step this curx cury cells)
+      (linebreak printer)
+    )
   )
+  (step [this curx cury cells]
   ; X und Y werden zunehmend erhoeht
   ; Wenn Y nicht uebereinstimmt, wird linebreak ausgegeben
   ; Wenn X nicht uebereinstimmt, wird leerstelle ausgegeben
   ; Wenn X und Y mit first cells ubereinstimmt wird 'X' ausgegeben
+    (if-let [current (first cells)]
+      (if (not= cury (:y current))
+        (do (linebreak printer) (recur minx (inc cury) cells))
+        (if (not= curx (:x current))
+          (do (dead_cell   printer) (recur (inc curx) cury cells))
+          (do (living_cell printer) (recur (inc curx) cury (rest cells)))
+        )
+      )
+    )
+  )
 )
 
 (defn- find_minx
-  ([cells] (find_minx nil cells))
+  ([cells] (find_minx (:x (first cells)) (rest cells)))
   ([minx cells]
-    (if (seq cells)
-      (if (< minx (:x (first cells)))
-        (recur (:x (first cells)) (rest cells))
+    (if-let [current (first cells)]
+      (if (< (:x current) minx)
+        (recur (:x current) (rest cells))
         (recur minx (rest cells))
       )
       minx
@@ -49,7 +64,7 @@
 
 (defn new_print_controler [cells]
   (let [miny (:y (first cells)) minx (find_minx cells)]
-    (PrintControlerImpl. minx miny cells (new_printer))
+    (PrintControlerImpl. minx minx miny cells (new_printer))
   )
 )
 
