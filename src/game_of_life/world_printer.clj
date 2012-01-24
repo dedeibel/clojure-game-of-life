@@ -63,7 +63,10 @@
 )
 
 (defn new_print_controler [cells]
-  (let [miny (:y (first cells)) minx (find_minx cells)]
+  (let [
+      miny (:y (first cells))
+      cell_minx (find_minx cells)
+      minx (if (and cell_minx (< cell_minx 0)) cell_minx 0)]
     (PrintControlerImpl. minx minx miny cells (new_printer))
   )
 )

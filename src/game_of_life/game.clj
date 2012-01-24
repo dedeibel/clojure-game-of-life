@@ -42,7 +42,7 @@
   (next_generation_of_cell
     world
     world
-    (cells_to_check_step world (vals (living_cells world)))
+    (cells_to_check_step world (living_cells world))
   )
 )
 
