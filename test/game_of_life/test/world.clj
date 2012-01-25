@@ -5,9 +5,9 @@
 )
 
 (deftest test_add
-  (is (-> (new_world) (invigorate (new_cell 0 0)) (alive 0 0)))
-  (is (not (-> (new_world) (invigorate (new_cell 0 0)) (alive 0 1))))
-  (is (-> (new_world) (invigorate (new_cell 1 0)) (alive 1 0)))
+  (is (-> (new_world)       (invigorate (new_cell 0 0)) (alive 0 0)))
+  (is (not (-> (new_world)  (invigorate (new_cell 0 0)) (alive 0 1))))
+  (is (-> (new_world)       (invigorate (new_cell 1 0)) (alive 1 0)))
 )
 
 (deftest test_add_multi
@@ -31,12 +31,9 @@
       (invigorate (new_cell 0 0))
     )]
     (is (= 1
-      (count
-        (filter
-          #(when %1 true)
-          (vals (neighbours_of world 1 1))
-        )
-      )
+      (count (filter #(when %1 true)
+        (vals (neighbours_of world 1 1))
+      ))
     ))
     (is (:nw (neighbours_of world 1 1)))
   )
@@ -75,3 +72,4 @@
     (is (= 2 (number_of (living (neighbours_of world 1 1)))))
   )
 )
+

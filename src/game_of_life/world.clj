@@ -1,5 +1,6 @@
 (ns game_of_life.world
   (:use game_of_life.cell)
+  (:use name.benjaminpeter.util)
 )
 
 (defprotocol World
@@ -13,6 +14,7 @@
 )
 
 (defrecord WorldKey [x y])
+
 (defn- make_key [cell]
   (WorldKey. (:x cell) (:y cell))
 )
@@ -21,8 +23,6 @@
   [:nw :n :ne :w :e :sw :s :se]
 )
 
-(declare new_world)
-
 (defrecord SimpleWorld [
     grid
   ]
@@ -30,7 +30,7 @@
   World
   (living_cells [this] (vals grid))
   (invigorate [this cell]
-    (new_world (assoc grid (make_key cell) cell))
+    (SimpleWorld. (assoc grid (make_key cell) cell))
   )
   (alive [this x y]
     (if-let [cell (get grid (WorldKey. x y))]
@@ -39,7 +39,7 @@
     )
   )
   (kill [this cell]
-    (new_world (dissoc grid (make_key cell)))
+    (SimpleWorld. (dissoc grid (make_key cell)))
   )
   (kill [this x y]
     (kill this (WorldKey. x y))
@@ -87,17 +87,12 @@
   )
 )
 
-(defn number_of [neighbours]
-  (count (vals neighbours))
+(defn new_world
+  ([] (SimpleWorld. {}))
 )
 
-(defmacro filter-map [bindings pred m]
-  `(select-keys ~m
-    (for [~bindings ~m
-      :when ~pred]
-      ~(first bindings)
-    )
-  )
+(defn number_of [neighbours]
+  (count (vals neighbours))
 )
 
 (defn living [neighbours]
@@ -106,10 +101,5 @@
 
 (defn dead [neighbours]
   (filter-map [key val] (not (:alive val)) neighbours)
-)
-
-(defn new_world
-  ([] (SimpleWorld. {}))
-  ([world] (SimpleWorld. world))
 )
 
