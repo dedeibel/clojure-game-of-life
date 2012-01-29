@@ -4,13 +4,23 @@
 )
 
 (defprotocol World
-  (neighbours_of [this cell] [this x y])
-  (all_neighbours_of [this cell create_cell] [this x y create_cell])
-  (living_cells [this])
-  (invigorate [this cell])
-  (alive [this x y])
-  (kill [this cell] [this x y])
-  (retrieve [this x y])
+  (neighbours_of [this cell] [this x y]
+    (str "Returns a map of all neighbour cells of the given cell. "
+         "The map consists of the compass direction of the cell "
+         "like :n and :se and the cell object for living cells and "
+         "nil for dead cels."
+    )
+  )
+  (all_neighbours_of [this cell create_cell] [this x y create_cell]
+    (str "Similar to neighbours_of but uses create_cell to create "
+         "living and dead cells into a returning map."
+    )
+  )
+  (living_cells [this] "Returns all living cells as lazy seq.")
+  (invigorate [this cell] "Adds cell as living cell to the world.")
+  (alive [this x y] "Tests if the cell at x y is alive.")
+  (kill [this cell] [this x y] "Kill the cell at x y.")
+  (retrieve [this x y] "Returns the cell at x y. Dead cells just return nil.")
 )
 
 (defrecord WorldKey [x y])
@@ -92,14 +102,17 @@
 )
 
 (defn number_of [neighbours]
+  "Returns the number of entries in a neighbours map."
   (count (vals neighbours))
 )
 
 (defn living [neighbours]
+  "Returns a map of neighbours only containing living cells."
   (filter-map [key val] (:alive val) neighbours)
 )
 
 (defn dead [neighbours]
+  "Returns a map of neighbours only containing dead cells."
   (filter-map [key val] (not (:alive val)) neighbours)
 )
 

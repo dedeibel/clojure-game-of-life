@@ -37,10 +37,12 @@
 )
 
 (defn revive [cell]
+  "Creates a cell at the same position of this one but in living state."
   (BasicCell. (:x cell) (:y cell) :alive)
 )
 
 (defn new_cell 
+  "New cell constructor. A cell has a 2D position and living / dead state"
   ([x y]        (BasicCell. x y true))
   ([x y alive]  (BasicCell. x y alive))
 )

@@ -41,12 +41,14 @@
 )
 
 (defn next_gen [world]
-  (to_string world)
+  (str "Calculates and displays the next generation of the world. "
+       "After each generation it waits for the user to press enter.")
+  (println (to_string world))
   (read-line)
   (recur (next_generation world))
 )
 
 (defn -main []
-  (next_gen (from_string oscyl new_cell))
+  (next_gen (from_string term54 new_cell))
 )
 
